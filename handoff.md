@@ -74,7 +74,7 @@ WSO2-Integrator-macOS-Repair-Kit.zip
 SHA-256:
 
 ```text
-304e7450065cd047e7311279e943d9b891ad010e2277d32a6ec1d6446df6c2b0
+416d6950bcafc98b51ab47ed754b1d962621043adc794d3cbe7ed9996fe1aff9
 ```
 
 On another Mac:
@@ -95,14 +95,24 @@ extension 5.12.3 from Visual Studio Marketplace, applies and validates the
 compatibility fixes, creates a rollback backup, clears only disposable WSO2
 webview caches, disables automatic extension updates so the fix is retained,
 and restarts WSO2 Integrator. On Intel Macs it also creates and selects a
-repaired machine-wide Ballerina runtime. It does not delete or modify
-integration projects.
+repaired machine-wide Ballerina runtime. For projects using the default WSO2
+model provider, the repaired Run action refreshes WSO2's short-lived access
+token from the IDE's secure credential store before starting the project. It
+does not delete integration projects or modify their Ballerina source files.
+
+The WSO2 provider requires a one-time Copilot sign-in. Complete the GitHub
+device-code login when prompted. The resulting refresh credential stays in
+the IDE's secure storage; no credential is included in this repository or the
+repair ZIP.
 
 The package was tested end to end on the developer workstation. The HTTP
 Service visualizer rendered its listener, base path, resources, and **Add
 Resource** controls with no loader remaining. A subsequent normal launch did
 not reproduce the command, stylesheet, local-resource, or internal extension
-errors.
+errors. The automatic provider refresh was also validated by running
+`inthotelfinder`: the access-token issue time changed before launch, the
+service listened on port `9090`, and a chat request returned HTTP `201` with a
+model-generated response.
 
 #### Intel macOS global TLS repair
 
