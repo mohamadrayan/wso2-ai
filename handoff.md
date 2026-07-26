@@ -1,6 +1,6 @@
 # WSO2 AI Integration Handoff
 
-Last updated: 2026-07-26
+Last updated: 2026-07-27
 
 ## Objective
 
@@ -177,6 +177,13 @@ After a full repair-kit rerun, the Ballerina language server also reported:
 
 The visualizer and Ballerina extensions activated successfully with all repair
 checks present.
+
+The application bundle was finally restored byte-for-byte from the official
+x64 DMG without copying the downloaded-file quarantine metadata. The installed
+copy at `/Applications/WSO2 Integrator.app` passes both strict deep code-signing
+verification and Gatekeeper assessment. A fresh launch from `/Applications`
+started its renderer, extension host, and the repaired Ballerina language
+server normally. The two obsolete recovery copies were permanently removed.
 
 ### Server
 
