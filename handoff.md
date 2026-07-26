@@ -74,7 +74,7 @@ WSO2-Integrator-macOS-Repair-Kit.zip
 SHA-256:
 
 ```text
-88f5b6fc3d9a1fab63a8a8ae67f092e7cb422596dbe5df3da41b898e1eef17f2
+304e7450065cd047e7311279e943d9b891ad010e2277d32a6ec1d6446df6c2b0
 ```
 
 On another Mac:
@@ -94,8 +94,9 @@ The repair detects the Mac architecture, downloads the official WSO2 Ballerina
 extension 5.12.3 from Visual Studio Marketplace, applies and validates the
 compatibility fixes, creates a rollback backup, clears only disposable WSO2
 webview caches, disables automatic extension updates so the fix is retained,
-and restarts WSO2 Integrator. It does not delete or modify integration
-projects.
+and restarts WSO2 Integrator. On Intel Macs it also creates and selects a
+repaired machine-wide Ballerina runtime. It does not delete or modify
+integration projects.
 
 The package was tested end to end on the developer workstation. The HTTP
 Service visualizer rendered its listener, base path, resources, and **Add
@@ -103,7 +104,7 @@ Resource** controls with no loader remaining. A subsequent normal launch did
 not reproduce the command, stylesheet, local-resource, or internal extension
 errors.
 
-#### Intel macOS project TLS repair
+#### Intel macOS global TLS repair
 
 The Intel/x64 distribution contains a malformed native Netty classifier at:
 
@@ -127,44 +128,55 @@ This is an environment packaging defect, not a Ballerina source-code error.
 The corresponding Apple Silicon classifier contains its native binary and was
 not affected during inspection.
 
-The repair ZIP now includes:
+The repair ZIP includes the official Netty 2.0.77.Final macOS Intel artifact:
 
 ```text
-WSO2-Ballerina-Project-TLS-Repair.command
 assets/netty-tcnative-boringssl-static-2.0.77.Final-osx-x86_64.jar
 ```
 
-The included binary is the official Netty 2.0.77.Final macOS Intel artifact
-from Maven Central. Its published SHA-1 checksum is:
+Its published Maven Central SHA-1 checksum is:
 
 ```text
 3b3dfbf6136c0b278205f042f449ef8f20813ce6
 ```
 
-Run the project repair once for each affected Intel project and select the
-folder containing `Ballerina.toml`. The tool:
+The main repair command fixes this once for the entire Intel Mac:
 
-- verifies the bundled native artifact;
-- saves `Ballerina.toml.before-wso2-tls-repair`;
-- copies the artifact into the project's `libs` directory;
-- adds it as a Java 21 platform dependency;
-- builds the project; and
-- confirms that the generated executable contains
-  `libnetty_tcnative_osx_x86_64.jnilib`.
+```text
+~/.ballerina/wso2-integrator-2201.13.4-fixed
+```
 
-It does not change `.bal` source files or modify the signed WSO2 application
-bundle. On Apple Silicon it exits without changing the project.
+It copies WSO2's bundled Ballerina 2201.13.4 distribution to that user-owned
+location, replaces the malformed HTTP and gRPC classifier JARs in the copy,
+links the existing bundled JDK, and configures the Ballerina extension to use
+the repaired runtime globally. This avoids macOS App Management restrictions
+and preserves the vendor-signed WSO2 application bundle.
 
-The repair was validated against:
+No per-project dependency or repair command is required. Existing and future
+projects inherit the corrected runtime automatically. The corresponding Apple
+Silicon classifier already contains its native binary, so the runtime copy is
+not created on Apple Silicon.
+
+The global repair was validated from clean project targets against:
 
 ```text
 /Users/mac/WSO2Integrator/prj-ai-integrator-training/int_sentimentanalyzer
+/Users/mac/WSO2Integrator/prjhotelfinder/inthotelfinder
 ```
 
-Before repair, this project failed during WSO2 model-provider initialization.
-After repair, it compiled without warnings, started successfully, and listened
-on port `9090`. The verification process was then stopped so the IDE can start
-the service normally without a port conflict.
+Neither project contains a local Netty platform dependency. Both generated
+executables contain `libnetty_tcnative_osx_x86_64.jnilib`.
+`inthotelfinder` then started successfully and listened on port `9090`; the
+verification process was stopped afterward so the IDE can use the port.
+
+After a full repair-kit rerun, the Ballerina language server also reported:
+
+```text
+-Dballerina.home=/Users/mac/.ballerina/wso2-integrator-2201.13.4-fixed
+```
+
+The visualizer and Ballerina extensions activated successfully with all repair
+checks present.
 
 ### Server
 
