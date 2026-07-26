@@ -43,7 +43,7 @@ reconfigured as part of the WSO2 setup.
 
 ### Developer workstation
 
-WSO2 Integrator 5.0.0 is installed at:
+WSO2 Integrator 5.0.0.1 (Intel/x64 build) is installed at:
 
 ```text
 /Applications/WSO2 Integrator.app
@@ -52,6 +52,56 @@ WSO2 Integrator 5.0.0 is installed at:
 The installer checksum was verified against the checksum published with the
 official WSO2 GitHub release. The application also passed macOS notarization
 verification.
+
+#### macOS HTTP Service visualizer repair
+
+The stock WSO2 Integrator 5.0.0.1 installation repeatedly left the HTTP
+Service visualizer loading. This was not an authentication or general network
+failure. The bundled Ballerina visualizer had desktop compatibility and
+packaging errors, including:
+
+- invocation of the unavailable `getContext` command;
+- invocation of the unavailable `BI.project-explorer.notify` command;
+- an incorrect local path for the WSO2 font stylesheet; and
+- a reference to an unbundled legacy theme stylesheet.
+
+The tested one-click repair package is stored at:
+
+```text
+WSO2-Integrator-macOS-Repair-Kit.zip
+```
+
+SHA-256:
+
+```text
+fb89a05d614e121944d40a3b6359eb30019ee63dcfd3289dd1a309a07f46e30c
+```
+
+On another Mac:
+
+1. Install WSO2 Integrator 5.0.0.1 in `/Applications`.
+2. Choose the Apple Silicon DMG for an M-series Mac or the x64 DMG for an
+   Intel Mac.
+3. Start WSO2 Integrator once, then quit it.
+4. Extract the repair ZIP and double-click
+   `WSO2-Integrator-macOS-Repair.command`.
+5. If Gatekeeper blocks it, Control-click the command, select **Open**, and
+   confirm **Open**.
+6. Wait for the success message, reopen the project, and select its HTTP
+   Service.
+
+The repair detects the Mac architecture, downloads the official WSO2 Ballerina
+extension 5.12.3 from Visual Studio Marketplace, applies and validates the
+compatibility fixes, creates a rollback backup, clears only disposable WSO2
+webview caches, disables automatic extension updates so the fix is retained,
+and restarts WSO2 Integrator. It does not delete or modify integration
+projects.
+
+The package was tested end to end on the developer workstation. The HTTP
+Service visualizer rendered its listener, base path, resources, and **Add
+Resource** controls with no loader remaining. A subsequent normal launch did
+not reproduce the command, stylesheet, local-resource, or internal extension
+errors.
 
 ### Server
 
